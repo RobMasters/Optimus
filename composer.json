@@ -1,0 +1,22 @@
+{
+    "name": "robmasters/optimus",
+    "description": "Optimus: Leader of the Transcoders",
+    "minimum-stability": "dev",
+    "authors": [
+        {
+            "name": "Rob Masters",
+            "email": "robmasters87@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-0": { "Optimus": "src" }
+    },
+    "require": {
+        "symfony/event-dispatcher": "2.2.x-dev",
+        "symfony/dom-crawler": "2.2.x-dev",
+        "symfony/css-selector": "2.2.x-dev"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "3.7.x"
+    }
+}
