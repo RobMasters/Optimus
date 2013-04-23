@@ -9,4 +9,4 @@ notifications:
 before_script:
     - composer install --dev
 
-script: "./bin/vendor/phpunit"
+script: "./vendor/bin/phpunit"
