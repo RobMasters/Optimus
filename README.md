@@ -1,6 +1,8 @@
 Optimus
 =======
 
+[![Build Status](https://secure.travis-ci.org/RobMasters/Optimus.png?branch=master)](http://travis-ci.org/RobMasters/Optimus)
+
 _DOM Transcoding using Symfony2 components_
 
 ## Installation
