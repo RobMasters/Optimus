@@ -1,0 +1,9 @@
+<phpunit backupGlobals="true"
+         backupStaticAttributes="false">
+
+    <testsuites>
+        <testsuite name="Optimus Test Suite">
+            <directory>./src/Optimus/Tests/</directory>
+        </testsuite>
+    </testsuites>
+</phpunit>
