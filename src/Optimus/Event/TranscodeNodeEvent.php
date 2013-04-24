@@ -49,6 +49,14 @@ class TranscodeNodeEvent extends Event
     }
 
     /**
+     * @return TranscodeNodeEvent
+     */
+    public function getParent()
+    {
+        return $this->parent;
+    }
+
+    /**
      * @return int
      */
     public function getPosition()
@@ -61,10 +69,14 @@ class TranscodeNodeEvent extends Event
      */
     public function getDepth()
     {
-        $visitor = new DepthVisitor();
-        $this->accept($visitor);
+        $depth = 0;
+        $parent = $this->parent;
+        while (!is_null($parent)) {
+            $parent = $parent->getParent();
+            $depth++;
+        }
 
-        return $visitor->getDepth() - 1;
+        return $depth;
     }
 
     /**

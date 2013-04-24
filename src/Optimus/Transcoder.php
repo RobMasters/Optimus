@@ -45,6 +45,9 @@ class Transcoder
         return $this;
     }
 
+    /**
+     * @return \DomDocument
+     */
     public function transcode()
     {
         $this->transcodeList($this->dom->childNodes);
@@ -58,32 +61,67 @@ class Transcoder
      */
     protected function transcodeList(\DOMNodeList $list, $parentEvent = null)
     {
-        $length = $list->length;
-        for ($i = 0; $i < $length; $i++) {
+        $i = 0;
+        $node = $list->item(0);
+
+        while ($node) {
             $node = $list->item($i);
-
             $event = new TranscodeNodeEvent($node, $parentEvent, $i);
-            $this->dispatcher->dispatch($this->getEventName($node), $event);
 
-            if ($event->isNodeRemoved()) {
-                $node->parentNode->removeChild($node);
+            switch ($node->nodeType) {
+                case XML_TEXT_NODE:
+                    $this->transcodeTextNode($event);
+                    break;
+
+                default:
+                    $this->transcodeElementNode($event);
             }
 
-            if ($children = $node->childNodes) {
+            $node = $node->nextSibling;
+            $i++;
+        }
+    }
+
+    /**
+     * @param TranscodeNodeEvent $event
+     */
+    protected function transcodeTextNode(TranscodeNodeEvent $event)
+    {
+        $this->dispatcher->dispatch($this->getEventName('text'), $event);
+    }
+
+    /**
+     * @param TranscodeNodeEvent $event
+     */
+    protected function transcodeElementNode(TranscodeNodeEvent $event)
+    {
+        $node = $event->getNode();
+        $this->dispatcher->dispatch($this->getEventName($node), $event);
+
+        if ($event->isNodeRemoved()) {
+            $node->parentNode->removeChild($node);
+        }
+
+        if (!$event->isPropagationStopped()) {
+            $this->dispatcher->dispatch($this->getEventName('*'), $event);
+
+            if (!$event->isPropagationStopped() && $children = $node->childNodes) {
                 $this->transcodeList($children, $event);
             }
         }
     }
 
     /**
-     * @param \DOMNode $node
+     * @param \DOMNode|string $subject
      * @return string
      */
-    private function getEventName(\DOMNode $node)
+    private function getEventName($subject)
     {
+        $name = ($subject instanceof \DOMNode) ? strtolower($subject->nodeName) : $subject;
+
         return sprintf('%s.%s',
             $this->eventPrefix,
-            strtolower($node->nodeName)
+            $name
         );
     }
 }

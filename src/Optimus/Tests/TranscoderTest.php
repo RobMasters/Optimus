@@ -2,6 +2,7 @@
 
 namespace Optimus\Tests;
 
+use Optimus\Event\TranscodeNodeEvent;
 use Optimus\Rule\AddPositionClassRule;
 use Optimus\Transcoder;
 use Symfony\Component\DomCrawler\Crawler;
@@ -26,21 +27,101 @@ class TranscoderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * TODO move into correct test case
+     * @test
      */
-    public function testPositionClassRule()
+    public function testChildListenerNotCalledWhenPropogationStopped()
     {
-        // Connect rules
-        $this->dispatcher->addListener('transcode.li', array(new AddPositionClassRule(), 'handle'));
+        $this->dispatcher->addListener('transcode.ul', function(TranscodeNodeEvent $event) use (&$count) {
+           $event->stopPropagation();
+        });
 
+        $childListenerCalled = false;
+        $this->dispatcher->addListener('transcode.li', function(TranscodeNodeEvent $event) use (&$childListenerCalled) {
+            if ($event->getNode()->nodeName === 'ul') {
+                $childListenerCalled = true;
+            }
+        });
+
+        $this->transcoder
+            ->setDocument($this->getDocument())
+            ->transcode()
+        ;
+
+        $this->assertFalse($childListenerCalled);
+    }
+
+    /**
+     * @test
+     */
+    public function testChildListenerNotCalledWhenNodeRemoved()
+    {
+        $this->dispatcher->addListener('transcode.ul', function(TranscodeNodeEvent $event) use (&$count) {
+           $event->removeNode();
+        });
+
+        $childListenerCalled = false;
+        $this->dispatcher->addListener('transcode.li', function(TranscodeNodeEvent $event) use (&$childListenerCalled) {
+            if ($event->getNode()->nodeName === 'ul') {
+                $childListenerCalled = true;
+            }
+        });
+
+        $this->transcoder
+            ->setDocument($this->getDocument())
+            ->transcode()
+        ;
+
+        $this->assertFalse($childListenerCalled);
+    }
+
+    /**
+     * @test
+     */
+    public function testGenericListenerNotCalledWhenPropogationStopped()
+    {
+        $this->dispatcher->addListener('transcode.ul', function(TranscodeNodeEvent $event) use (&$count) {
+           $event->stopPropagation();
+        });
+
+        $ulGenericListenerCalled = false;
+        $this->dispatcher->addListener('transcode.*', function(TranscodeNodeEvent $event) use (&$ulGenericListenerCalled) {
+            if ($event->getNode()->nodeName === 'ul') {
+                $ulGenericListenerCalled = true;
+            }
+        });
+
+        $this->transcoder
+            ->setDocument($this->getDocument())
+            ->transcode()
+        ;
+
+        $this->assertFalse($ulGenericListenerCalled);
+    }
+
+    /**
+     * @return \DOMDocument
+     */
+    protected function getDocument()
+    {
         $dom = new \DOMDocument();
-        $dom->loadHTML('<html><head></head><body><div><h1>Heading</h1><ul><li>First</li><li>Second</li></ul><div>Some text <span>in a span</span></div></div></body>');
-        $transcoded = $this->transcoder->setDocument($dom)->transcode();
+        $html = <<<ENDHTML
+<html>
+    <head></head>
+    <body>
+        <div>
+            <h1>Heading</h1>
+            <ul>
+                <li>First</li>
+                <li>Second</li>
+            </ul>
+            <div>Some text <span>in a span</span></div>
+        </div>
+    </body>
+</html>
+ENDHTML;
 
-        $crawler = new Crawler();
-        $crawler->add($transcoded->saveHTML());
+        $dom->loadHTML($html);
 
-        $this->assertEquals('first', $crawler->filter('li')->first()->attr('class'));
-        $this->assertEquals('last', $crawler->filter('li')->last()->attr('class'));
+        return $dom;
     }
 }

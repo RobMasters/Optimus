@@ -1,5 +1,8 @@
 <phpunit backupGlobals="true"
-         backupStaticAttributes="false">
+         backupStaticAttributes="false"
+         convertNoticesToExceptions="false"
+         convertWarningsToExceptions="false"
+>
 
     <testsuites>
         <testsuite name="Optimus Test Suite">
