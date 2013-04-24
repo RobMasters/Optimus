@@ -2,7 +2,6 @@
 
 namespace Optimus\Event;
 
-use Optimus\Visitor\NodeVisitor;
 use Symfony\Component\EventDispatcher\Event;
 
 class TranscodeNodeEvent extends Event
@@ -76,18 +75,6 @@ class TranscodeNodeEvent extends Event
         }
 
         return $depth;
-    }
-
-    /**
-     * @param NodeVisitor $visitor
-     */
-    public function accept(NodeVisitor $visitor)
-    {
-        $visitor->visitNode($this);
-
-        if ($this->parent instanceof self) {
-            $this->parent->accept($visitor);
-        }
     }
 
     /**
