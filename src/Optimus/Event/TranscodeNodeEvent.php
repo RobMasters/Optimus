@@ -2,7 +2,6 @@
 
 namespace Optimus\Event;
 
-use Optimus\Visitor\DepthVisitor;
 use Optimus\Visitor\NodeVisitor;
 use Symfony\Component\EventDispatcher\Event;
 
