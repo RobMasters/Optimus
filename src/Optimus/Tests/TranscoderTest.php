@@ -3,9 +3,7 @@
 namespace Optimus\Tests;
 
 use Optimus\Event\TranscodeNodeEvent;
-use Optimus\Rule\AddPositionClassRule;
 use Optimus\Transcoder;
-use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class TranscoderTest extends \PHPUnit_Framework_TestCase
@@ -37,9 +35,7 @@ class TranscoderTest extends \PHPUnit_Framework_TestCase
 
         $childListenerCalled = false;
         $this->dispatcher->addListener('transcode.li', function(TranscodeNodeEvent $event) use (&$childListenerCalled) {
-            if ($event->getNode()->nodeName === 'ul') {
-                $childListenerCalled = true;
-            }
+            $childListenerCalled = true;
         });
 
         $this->transcoder
@@ -61,9 +57,7 @@ class TranscoderTest extends \PHPUnit_Framework_TestCase
 
         $childListenerCalled = false;
         $this->dispatcher->addListener('transcode.li', function(TranscodeNodeEvent $event) use (&$childListenerCalled) {
-            if ($event->getNode()->nodeName === 'ul') {
-                $childListenerCalled = true;
-            }
+            $childListenerCalled = true;
         });
 
         $this->transcoder
