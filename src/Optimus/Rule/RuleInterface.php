@@ -3,6 +3,7 @@
 namespace Optimus\Rule;
 
 use Optimus\Event\TranscodeNodeEvent;
+use Optimus\Constraint\ConstraintInterface;
 
 interface RuleInterface
 {
@@ -11,4 +12,9 @@ interface RuleInterface
      * @return mixed
      */
     public function handle(TranscodeNodeEvent $event);
+
+    /**
+     * @return array|ConstraintInterface[]
+     */
+    public function getConstraints();
 }
