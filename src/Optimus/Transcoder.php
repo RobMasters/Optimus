@@ -19,7 +19,7 @@ class Transcoder
     protected $eventPrefix;
 
     /**
-     * @var \DomDocument
+     * @var \DOMDocument
      */
     protected $dom;
 
@@ -45,7 +45,7 @@ class Transcoder
     }
 
     /**
-     * @return \DomDocument
+     * @return \DOMDocument
      */
     public function transcode()
     {
