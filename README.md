@@ -37,8 +37,7 @@ $dispatcher->addListener('transcode.*', [new AddPositionClassRule(), 'handle']);
 // Constraints may only be used with listeners that implement Optimus\Rule\RuleInterface.
 // There are several pre-defined rules you may wish to use, but it's simple to make your own too as long as they implement the interface
 $rule = new AddPositionClassRule();
-$depthConstraint = new DepthConstraint(5, 10);
-$rule->addConstraint($depthConstraint);
+$rule->addConstraint(new DepthConstraint(5, 10));
 $dispatcher->addListener('transcode.*', [$rule, 'handle']);
 
 /** @var \Optimus\Transcoder $transcoder */
