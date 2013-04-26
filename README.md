@@ -23,7 +23,7 @@ $ php composer.phar install
 $dispatcher = new EventDispatcher();
 
 // Listen for all nodes in the DOMDocument.
-// Your own listener can be anything you want as long as it is callable
+// Your own listener can be anything you want as long as it is callable (or implements \Optimus\Rule\RuleInterface)
 $dispatcher->addListener('transcode.*', function(TranscodeNodeEvent $event) {
   // your custom logic
   $event->getNode()->setAttribute('data-transcoded', 1);
@@ -31,14 +31,14 @@ $dispatcher->addListener('transcode.*', function(TranscodeNodeEvent $event) {
 
 // Listen for all nodes in the DOMDocument.
 // Use a pre-defined rule
-$dispatcher->addListener('transcode.*', [new AddPositionClassRule(), 'handle']);
+$dispatcher->addListener('transcode.*', new AddPositionClassRule());
 
 // Listen for all nodes in the DOMDocument with a 'depth' from 5 to 10
-// Constraints may only be used with listeners that implement Optimus\Rule\RuleInterface.
+// Constraints may only be used with listeners that implement \Optimus\Rule\RuleInterface.
 // There are several pre-defined rules you may wish to use, but it's simple to make your own too as long as they implement the interface
 $rule = new AddPositionClassRule();
 $rule->addConstraint(new DepthConstraint(5, 10));
-$dispatcher->addListener('transcode.*', [$rule, 'handle']);
+$dispatcher->addListener('transcode.*', $rule);
 
 /** @var \Optimus\Transcoder $transcoder */
 $transcoder = new Transcoder($dispatcher);

@@ -10,6 +10,21 @@ use Symfony\Component\EventDispatcher\EventDispatcher as BaseDispatcher;
 class EventDispatcher extends BaseDispatcher
 {
     /**
+     * @param string $eventName
+     * @param callable $listener
+     * @param int $priority
+     */
+    public function addListener($eventName, $listener, $priority = 0)
+    {
+        if ($listener instanceof RuleInterface) {
+            $listener = array($listener, 'handle');
+        }
+
+        parent::addListener($eventName, $listener, $priority);
+    }
+
+
+    /**
      * @param $listeners
      * @param string $eventName
      * @param Event $event
