@@ -31,17 +31,15 @@ $dispatcher->addListener('transcode.*', function(TranscodeNodeEvent $event) {
 
 // Listen for all nodes in the DOMDocument.
 // Use a pre-defined rule
-$dispatcher->addListener('transcode.*', array(new AddPositionClassRule(), 'handle'));
+$dispatcher->addListener('transcode.*', [new AddPositionClassRule(), 'handle']);
 
 // Listen for all nodes in the DOMDocument with a 'depth' from 5 to 10
 // Constraints may only be used with listeners that implement Optimus\Rule\RuleInterface.
 // There are several pre-defined rules you may wish to use, but it's simple to make your own too as long as they implement the interface
 $rule = new AddPositionClassRule();
-$depthConstraint = new DepthConstraint();
-$depthConstraint->setMinimum(5);
-$depthConstraint->setMaximum(10);
+$depthConstraint = new DepthConstraint(5, 10);
 $rule->addConstraint($depthConstraint);
-$dispatcher->addListener('transcode.*', array($rule, 'handle'));
+$dispatcher->addListener('transcode.*', [$rule, 'handle']);
 
 /** @var \Optimus\Transcoder $transcoder */
 $transcoder = new Transcoder($dispatcher);
