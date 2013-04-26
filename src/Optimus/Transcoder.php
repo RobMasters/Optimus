@@ -3,14 +3,13 @@
 namespace Optimus;
 
 use Optimus\Event\TranscodeNodeEvent;
-use Symfony\Component\DomCrawler\Crawler;
-use Symfony\Component\EventDispatcher\EventDispatcher;
+use Optimus\EventDispatcher;
 
 class Transcoder
 {
     /**
      *
-     * @var \Symfony\Component\EventDispatcher\EventDispatcher
+     * @var \Optimus\EventDispatcher
      */
     protected $dispatcher;
 
@@ -25,7 +24,7 @@ class Transcoder
     protected $dom;
 
     /**
-     * @param EventDispatcher $dispatcher
+     * @param \Optimus\EventDispatcher $dispatcher
      * @param string $eventPrefix
      */
     function __construct(EventDispatcher $dispatcher, $eventPrefix = 'transcode')

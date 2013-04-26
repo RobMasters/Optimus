@@ -4,7 +4,7 @@ namespace Optimus\Tests;
 
 use Optimus\Event\TranscodeNodeEvent;
 use Optimus\Transcoder;
-use Symfony\Component\EventDispatcher\EventDispatcher;
+use Optimus\EventDispatcher;
 
 class TranscoderTest extends \PHPUnit_Framework_TestCase
 {
