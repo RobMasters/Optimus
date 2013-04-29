@@ -1,17 +1,17 @@
 <?php
 
-namespace Optimus\Rule;
+namespace Optimus\Transformer;
 
 use Optimus\Event\TranscodeNodeEvent;
 use Optimus\Constraint\ConstraintInterface;
 
-interface RuleInterface
+interface TransformerInterface
 {
     /**
      * @param TranscodeNodeEvent $event
      * @return mixed
      */
-    public function handle(TranscodeNodeEvent $event);
+    public function transform(TranscodeNodeEvent $event);
 
     /**
      * @return array|ConstraintInterface[]

@@ -1,21 +1,20 @@
 <?php
 
-namespace Optimus\Tests\Rule;
+namespace Optimus\Tests\Transformer;
 
-use Optimus\Rule\AddPositionClassRule;
+use Optimus\Transformer\AddPositionClassTransformer;
 use \Mockery as m;
 
-
-class AddPositionClassRuleTest extends \PHPUnit_Framework_TestCase
+class AddPositionClassTransformerTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var AddPositionClassRule
+     * @var AddPositionClassTransformer
      */
-    protected $rule;
+    protected $transformer;
 
     protected function setUp()
     {
-        $this->rule = new AddPositionClassRule();
+        $this->transformer = new AddPositionClassTransformer();
     }
 
     protected function tearDown()
@@ -34,7 +33,7 @@ class AddPositionClassRuleTest extends \PHPUnit_Framework_TestCase
         /** @var $node \DOMElement */
         $node = $document->getElementsByTagName('div')->item(0);
         $event = $this->getMockEvent($node, 0);
-        $this->rule->handle($event);
+        $this->transformer->transform($event);
 
         $this->assertContains('first', $node->getAttribute('class'));
     }
@@ -50,7 +49,7 @@ class AddPositionClassRuleTest extends \PHPUnit_Framework_TestCase
         /** @var $node \DOMElement */
         $node = $document->getElementsByTagName('div')->item(2);
         $event = $this->getMockEvent($node, 0);
-        $this->rule->handle($event);
+        $this->transformer->transform($event);
 
         $this->assertContains('last', $node->getAttribute('class'));
     }
@@ -66,7 +65,7 @@ class AddPositionClassRuleTest extends \PHPUnit_Framework_TestCase
         /** @var $node \DOMElement */
         $node = $document->getElementsByTagName('div')->item(2);
         $event = $this->getMockEvent($node, 0);
-        $this->rule->handle($event);
+        $this->transformer->transform($event);
 
         $this->assertContains('last', $node->getAttribute('class'));
     }
@@ -79,12 +78,12 @@ class AddPositionClassRuleTest extends \PHPUnit_Framework_TestCase
         $document = new \DOMDocument();
         $document->loadHTML('<div>a</div><div>b</div><div>c</div>This is a text node');
 
-        $this->setExpectedException('\RuntimeException', 'AddPositionClassRule can only process element nodes');
+        $this->setExpectedException('\RuntimeException', 'AddPositionClassTransformer can only process element nodes');
 
         /** @var $node \DOMElement */
         $textNode = $document->getElementsByTagName('div')->item(2)->nextSibling;
         $event = $this->getMockEvent($textNode, 0);
-        $this->rule->handle($event);
+        $this->transformer->transform($event);
     }
 
     /**

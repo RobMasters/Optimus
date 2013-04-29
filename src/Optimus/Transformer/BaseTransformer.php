@@ -1,10 +1,10 @@
 <?php
 
-namespace Optimus\Rule;
+namespace Optimus\Transformer;
 
 use Optimus\Constraint\ConstraintInterface;
 
-abstract class BaseRule implements RuleInterface
+abstract class BaseTransformer implements TransformerInterface
 {
     /**
      * @var array|ConstraintInterface[]

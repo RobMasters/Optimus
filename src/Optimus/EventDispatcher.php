@@ -3,26 +3,27 @@
 namespace Optimus;
 
 use Optimus\Event\TranscodeNodeEvent;
-use Optimus\Rule\RuleInterface;
+use Optimus\Transformer\TransformerInterface;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventDispatcher as BaseDispatcher;
 
 class EventDispatcher extends BaseDispatcher
 {
     /**
-     * @param string $eventName
-     * @param callable $listener
+     * @param array|string $nodeNames
+     * @param TransformerInterface $transformer
      * @param int $priority
      */
-    public function addListener($eventName, $listener, $priority = 0)
+    public function addTransformer($nodeNames, TransformerInterface $transformer, $priority = 0)
     {
-        if ($listener instanceof RuleInterface) {
-            $listener = array($listener, 'handle');
+        $nodeNames = (array) $nodeNames;
+        foreach ($nodeNames as $nodeName) {
+            // TODO - evaluate event names and add constraints dynamically
+            // e.g. for "div.container" a relevant HasClass constraint should be added
+
+            parent::addListener($nodeName, array($transformer, 'transform'), $priority);
         }
-
-        parent::addListener($eventName, $listener, $priority);
     }
-
 
     /**
      * @param $listeners
@@ -32,7 +33,7 @@ class EventDispatcher extends BaseDispatcher
     protected function doDispatch($listeners, $eventName, Event $event)
     {
         foreach ($listeners as $listener) {
-            if ($listener instanceof RuleInterface && $event instanceof TranscodeNodeEvent) {
+            if ($listener instanceof TransformerInterface && $event instanceof TranscodeNodeEvent) {
                 $constraints = $listener->getConstraints();
                 foreach ($constraints as $constraint) {
                     if ($constraint->constrain($event->getNode())) {

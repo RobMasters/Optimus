@@ -1,17 +1,17 @@
 <?php
 
-namespace Optimus\Rule;
+namespace Optimus\Transformer;
 
 use Optimus\Event\TranscodeNodeEvent;
 
-class AddPositionClassRule extends BaseRule
+class AddPositionClassTransformer extends BaseTransformer
 {
-    public function handle(TranscodeNodeEvent $event)
+    public function transform(TranscodeNodeEvent $event)
     {
         $node = $event->getNode();
 
         if (!$node instanceof \DOMElement) {
-            throw new \RuntimeException('AddPositionClassRule can only process element nodes');
+            throw new \RuntimeException('AddPositionClassTransformer can only process element nodes');
         }
 
         if ($event->getPosition() === 0) {
