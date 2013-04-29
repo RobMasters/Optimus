@@ -45,7 +45,7 @@ which can be anything that is callable. e.g.
 
 ```php
 // Remove all script nodes from the DOMDocument.
-$dispatcher->addListener('div', function(TranscodeNodeEvent $event) {
+$dispatcher->addListener('div', function(TranscodeElementEvent $event) {
   $event->removeNode(); // also stops propagation as there's no point continuing
 });
 
@@ -114,7 +114,7 @@ $dispatcher->addTransformer('#container', $transformer);
 
 # Adding class constraint(s) for <li> tags
 // This...
-$transformer->addConstraint(new HasClassConstraint(array('first', 'selected'));
+$transformer->addConstraint(new HasClassConstraint(['first', 'selected']);
 $dispatcher->addTransformer('li', $transformer);
 
 // ...is exactly equivalent to this:
