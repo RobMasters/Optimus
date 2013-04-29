@@ -114,7 +114,7 @@ $dispatcher->addTransformer('#container', $transformer);
 
 # Adding class constraint(s) for <li> tags
 // This...
-$transformer->addConstraint(new HasClassConstraint(['first', 'selected']);
+$transformer->addConstraint(new HasClassConstraint(['first', 'selected']));
 $dispatcher->addTransformer('li', $transformer);
 
 // ...is exactly equivalent to this:
