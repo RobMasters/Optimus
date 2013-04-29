@@ -89,7 +89,7 @@ class DepthConstraintTest extends \PHPUnit_Framework_TestCase
 
         $this->constraint->setMinimum(5);
         $this->constraint->setMaximum(5);
-        $this->constraint->constrain(new \DOMNode());
+        $this->constraint->constrain(new \DOMElement('div'));
     }
 
     /**
@@ -104,6 +104,33 @@ class DepthConstraintTest extends \PHPUnit_Framework_TestCase
 
         $this->constraint->setMinimum(5);
         $this->constraint->setMaximum(4);
-        $this->constraint->constrain(new \DOMNode());
+        $this->constraint->constrain(new \DOMElement('div'));
+    }
+
+    public function eventNameProvider()
+    {
+        return array(
+            array('div'),
+            array('div.badger'),
+            array('div.badger.monkey'),
+            array('div#beaver.badger'),
+            array('div#beaver.badger.monkey'),
+            array('#beaver.badger.monkey'),
+            array('div.badger li.monkey')
+        );
+    }
+
+    /**
+     * @dataProvider eventNameProvider
+     */
+    public function testNothing($eventName)
+    {
+        if (preg_match('/^([a-z]*)(?:#([a-z0-9_-]+))?((?:\.[a-z0-9_-]+)*)$/', $eventName, $matches)) {
+            $tag = $matches[1];
+            $id = $matches[2];
+            $classes = explode('.', trim($matches[3], '.'));
+            $a = 1;
+        }
+        $this->assertTrue(true);
     }
 }

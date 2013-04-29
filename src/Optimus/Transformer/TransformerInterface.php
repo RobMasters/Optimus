@@ -14,6 +14,12 @@ interface TransformerInterface
     public function transform(TranscodeNodeEvent $event);
 
     /**
+     * @param ConstraintInterface $constraint
+     * @return TransformerInterface
+     */
+    public function addConstraint(ConstraintInterface $constraint);
+
+    /**
      * @return array|ConstraintInterface[]
      */
     public function getConstraints();

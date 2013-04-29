@@ -33,10 +33,13 @@ abstract class BaseTransformer implements TransformerInterface
 
     /**
      * @param ConstraintInterface $constraint
+     * @return $this|\Optimus\Transformer\TransformerInterface
      */
     public function addConstraint(ConstraintInterface $constraint)
     {
         $this->constraints[] = $constraint;
+
+        return $this;
     }
 
     /**

@@ -79,15 +79,46 @@ Here is the simplest example:
 $dispatcher->addTransformer('*', new AddPositionClassTransformer());
 ```
 
-Here's an example of listening to all &lt;div&gt; and &lt;li&gt; nodes in the document that match a 'depth' constraint
-(this refers to how deeply nested it is in the DOM) of being no less 5 deep and no greater than 10.
+This method also allows you to specify multiple selectors at once for convenience. Behind the scenes this will add a listener
+for each selector given. e.g.
 
 ```php
-// Transform div and li nodes in the DOMDocument with a 'depth' from 5 to 10
-// There are several pre-defined transformers you may wish to use, but it's simple to make your own too as long as they implement the interface
+// Add position classes to all &lt;div&gt; and &lt;li&gt; nodes in the document
 $transformer = new AddPositionClassTransformer();
-$transformer->addConstraint(new DepthConstraint(5, 10));
 $dispatcher->addTransformer(['div', 'li'], $transformer);
+```
+
+### Limiting which Transformers are applied using Constraints
+
+You are able to target much more specific nodes by adding as many constraints as you wish to a Transformer. The event will
+only be triggered if all of the constraints are met. e.g.
+
+```php
+// Only transform nodes that are nested at least 5 levels deep in the DOM, but no more than 10,
+$transformer->addConstraint(new DepthConstraint(5, 10));
+$dispatcher->addTransformer('*', $transformer);
+```
+
+For added convenience, certain constraints can be added by specifying them as a CSS selector when adding the Transformer
+to the Event Dispatcher. e.g.
+
+```php
+# Adding an id constraint for any tag
+// This...
+$transformer->addConstraint(new HasAttributeConstraint('id', 'container'));
+$dispatcher->addTransformer('*', $transformer);
+
+// ...is exactly equivalent to this:
+$dispatcher->addTransformer('#container', $transformer);
+
+
+# Adding class constraint(s) for &lt;li&gt; tags
+// This...
+$transformer->addConstraint(new HasClassConstraint(array('first', 'selected'));
+$dispatcher->addTransformer('li', $transformer);
+
+// ...is exactly equivalent to this:
+$dispatcher->addTransformer('li.first.selected', $transformer);
 ```
 
 ## Testing

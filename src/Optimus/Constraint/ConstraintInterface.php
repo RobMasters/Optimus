@@ -5,8 +5,8 @@ namespace Optimus\Constraint;
 interface ConstraintInterface
 {
     /**
-     * @param \DOMNode $node
+     * @param \DOMElement $node
      * @return bool
      */
-    public function constrain(\DOMNode $node);
+    public function constrain(\DOMElement $node);
 }
