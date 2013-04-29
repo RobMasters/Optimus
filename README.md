@@ -83,7 +83,7 @@ This method also allows you to specify multiple selectors at once for convenienc
 for each selector given. e.g.
 
 ```php
-// Add position classes to all &lt;div&gt; and &lt;li&gt; nodes in the document
+// Add position classes to all <div> and <li> nodes in the document
 $transformer = new AddPositionClassTransformer();
 $dispatcher->addTransformer(['div', 'li'], $transformer);
 ```
@@ -112,7 +112,7 @@ $dispatcher->addTransformer('*', $transformer);
 $dispatcher->addTransformer('#container', $transformer);
 
 
-# Adding class constraint(s) for &lt;li&gt; tags
+# Adding class constraint(s) for <li> tags
 // This...
 $transformer->addConstraint(new HasClassConstraint(array('first', 'selected'));
 $dispatcher->addTransformer('li', $transformer);
