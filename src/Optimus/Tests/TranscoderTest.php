@@ -29,12 +29,12 @@ class TranscoderTest extends \PHPUnit_Framework_TestCase
      */
     public function testChildListenerNotCalledWhenPropogationStopped()
     {
-        $this->dispatcher->addListener('transcode.ul', function(TranscodeNodeEvent $event) use (&$count) {
+        $this->dispatcher->addListener('ul', function(TranscodeNodeEvent $event) use (&$count) {
            $event->stopPropagation();
         });
 
         $childListenerCalled = false;
-        $this->dispatcher->addListener('transcode.li', function(TranscodeNodeEvent $event) use (&$childListenerCalled) {
+        $this->dispatcher->addListener('li', function() use (&$childListenerCalled) {
             $childListenerCalled = true;
         });
 
@@ -51,12 +51,12 @@ class TranscoderTest extends \PHPUnit_Framework_TestCase
      */
     public function testChildListenerNotCalledWhenNodeRemoved()
     {
-        $this->dispatcher->addListener('transcode.ul', function(TranscodeNodeEvent $event) use (&$count) {
+        $this->dispatcher->addListener('ul', function(TranscodeNodeEvent $event) use (&$count) {
            $event->removeNode();
         });
 
         $childListenerCalled = false;
-        $this->dispatcher->addListener('transcode.li', function(TranscodeNodeEvent $event) use (&$childListenerCalled) {
+        $this->dispatcher->addListener('li', function(TranscodeNodeEvent $event) use (&$childListenerCalled) {
             $childListenerCalled = true;
         });
 
@@ -73,12 +73,12 @@ class TranscoderTest extends \PHPUnit_Framework_TestCase
      */
     public function testGenericListenerNotCalledWhenPropogationStopped()
     {
-        $this->dispatcher->addListener('transcode.ul', function(TranscodeNodeEvent $event) use (&$count) {
+        $this->dispatcher->addListener('ul', function(TranscodeNodeEvent $event) use (&$count) {
            $event->stopPropagation();
         });
 
         $ulGenericListenerCalled = false;
-        $this->dispatcher->addListener('transcode.*', function(TranscodeNodeEvent $event) use (&$ulGenericListenerCalled) {
+        $this->dispatcher->addListener('*', function(TranscodeNodeEvent $event) use (&$ulGenericListenerCalled) {
             if ($event->getNode()->nodeName === 'ul') {
                 $ulGenericListenerCalled = true;
             }

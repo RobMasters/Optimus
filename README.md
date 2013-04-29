@@ -29,8 +29,7 @@ event dispatcher. Then you can fetch the transcoded output from the Transcoder.
 $dispatcher = new EventDispatcher();
 
 /** @var \Optimus\Transcoder $transcoder */
-$eventPrefix = 'transcode'; // This is the default - you don't need to specify this, but can choose a different prefix
-$transcoder = new Transcoder($dispatcher, $eventPrefix);
+$transcoder = new Transcoder($dispatcher);
 $transcoder->setDocument($domDocument); // $domDocument is obtained elsewhere
 
 // Add your listeners/transformers...
@@ -45,19 +44,32 @@ Because the Event Dispatcher directly extends the Symfony2 EventDispatcher compo
 which can be anything that is callable. e.g.
 
 ```php
-// Listen for all nodes in the DOMDocument.
-$dispatcher->addListener('transcode.*', function(TranscodeNodeEvent $event) {
+// Remove all script nodes from the DOMDocument.
+$dispatcher->addListener('div', function(TranscodeNodeEvent $event) {
+  $event->removeNode(); // also stops propagation as there's no point continuing
+});
+
+// Listen for all nodes in the DOMDocument. NOTE: this does not include text nodes
+$dispatcher->addListener('*', function(TranscodeElementEvent $event) {
+  /** @var \DOMElement $node **/
+  $node = $event->getNode();
+
+  if ($node->nodeName === 'script') {
+    throw new \Exception('This should never get thrown as the specific 'div' listener is stopping propagation');
+  }
+
   // your custom logic
-  $event->getNode()->setAttribute('data-transcoded', 1);
+  $node->setAttribute('data-transcoded', 1);
 });
 ```
 
-When using the addListener() method you'll need to specify the full event name, which consists of the Transcoder's specified prefix
-followed by a dot and then the name of the node. As shown above, a wilcard character, '*', can be used to listen to all nodes.
+The event name to listen to is the name of the node (i.e. 'div' or 'ul') or a wilcard character, '*', which can be used to
+listen to all element nodes. This 'wildcard' event is dispatched after the specific one for the node and uses  the same
+event instance, so if the propagation was stopped in a listener to the 'node name' event then the wildcard event will not
+be dispatched.
 
-There is a better way of adding listeners though, which is to use a Transformer object. This offers a simpler syntax and
-provides much greater control as you're able to apply 'Constraints' to each Transformer, meaning they will only be called
-when all of the constraints are satisfied.
+A simpler option is to use a Transformer object. This provides much greater control as you're able to apply 'Constraints'
+to each Transformer, meaning they will only be called when all of the constraints are satisfied.
 
 Here is the simplest example:
 
@@ -67,7 +79,7 @@ Here is the simplest example:
 $dispatcher->addTransformer('*', new AddPositionClassTransformer());
 ```
 
-Here's an example of listening to all DIV and LI nodes in the document that match a 'depth' constraint
+Here's an example of listening to all &lt;div&gt; and &lt;li&gt; nodes in the document that match a 'depth' constraint
 (this refers to how deeply nested it is in the DOM) of being no less 5 deep and no greater than 10.
 
 ```php

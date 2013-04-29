@@ -2,7 +2,9 @@
 
 namespace Optimus;
 
+use Optimus\Event\TranscodeElementEvent;
 use Optimus\Event\TranscodeNodeEvent;
+use Optimus\Event\TranscodeTextEvent;
 use Optimus\EventDispatcher;
 
 class Transcoder
@@ -14,23 +16,16 @@ class Transcoder
     protected $dispatcher;
 
     /**
-     * @var string
-     */
-    protected $eventPrefix;
-
-    /**
      * @var \DOMDocument
      */
     protected $dom;
 
     /**
      * @param \Optimus\EventDispatcher $dispatcher
-     * @param string $eventPrefix
      */
-    function __construct(EventDispatcher $dispatcher, $eventPrefix = 'transcode')
+    function __construct(EventDispatcher $dispatcher)
     {
         $this->dispatcher = $dispatcher;
-        $this->eventPrefix = $eventPrefix;
     }
 
     /**
@@ -65,15 +60,20 @@ class Transcoder
 
         while ($node) {
             $node = $list->item($i);
-            $event = new TranscodeNodeEvent($node, $parentEvent, $i);
 
             switch ($node->nodeType) {
                 case XML_TEXT_NODE:
+                    $event = new TranscodeTextEvent($node, $parentEvent, $i);
                     $this->transcodeTextNode($event);
                     break;
 
-                default:
+                case XML_ELEMENT_NODE:
+                    $event = new TranscodeElementEvent($node, $parentEvent, $i);
                     $this->transcodeElementNode($event);
+                    break;
+
+                default:
+                    // ?
             }
 
             $node = $node->nextSibling;
@@ -86,7 +86,7 @@ class Transcoder
      */
     protected function transcodeTextNode(TranscodeNodeEvent $event)
     {
-        $this->dispatcher->dispatch($this->getEventName('text'), $event);
+        $this->dispatcher->dispatch('text', $event);
     }
 
     /**
@@ -95,32 +95,18 @@ class Transcoder
     protected function transcodeElementNode(TranscodeNodeEvent $event)
     {
         $node = $event->getNode();
-        $this->dispatcher->dispatch($this->getEventName($node), $event);
+        $this->dispatcher->dispatch($node->nodeName, $event);
 
         if ($event->isNodeRemoved()) {
             $node->parentNode->removeChild($node);
         }
 
         if (!$event->isPropagationStopped()) {
-            $this->dispatcher->dispatch($this->getEventName('*'), $event);
+            $this->dispatcher->dispatch('*', $event);
 
             if (!$event->isPropagationStopped() && $children = $node->childNodes) {
                 $this->transcodeList($children, $event);
             }
         }
-    }
-
-    /**
-     * @param \DOMNode|string $subject
-     * @return string
-     */
-    private function getEventName($subject)
-    {
-        $name = ($subject instanceof \DOMNode) ? strtolower($subject->nodeName) : $subject;
-
-        return sprintf('%s.%s',
-            $this->eventPrefix,
-            $name
-        );
     }
 }

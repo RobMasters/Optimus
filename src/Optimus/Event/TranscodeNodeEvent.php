@@ -4,7 +4,7 @@ namespace Optimus\Event;
 
 use Symfony\Component\EventDispatcher\Event;
 
-class TranscodeNodeEvent extends Event
+abstract class TranscodeNodeEvent extends Event
 {
     /**
      * @var \DOMNode
@@ -31,7 +31,7 @@ class TranscodeNodeEvent extends Event
      * @param TranscodeNodeEvent $parent
      * @param int $position
      */
-    function __construct(\DOMNode $node, TranscodeNodeEvent $parent = null, $position = 0)
+    function __construct($node, TranscodeNodeEvent $parent = null, $position = 0)
     {
         $this->node = $node;
         $this->parent = $parent;
