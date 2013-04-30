@@ -13,32 +13,35 @@ use Symfony\Component\EventDispatcher\EventDispatcher as BaseDispatcher;
 class EventDispatcher extends BaseDispatcher
 {
     /**
-     * @param array|string $nodeNames
+     * @param array|string $selectors
      * @param TransformerInterface $transformer
      * @param int $priority
      * @throws Exception\InvalidArgumentException
      */
-    public function addTransformer($nodeNames, TransformerInterface $transformer, $priority = 0)
+    public function addTransformer($selectors, TransformerInterface $transformer, $priority = 0)
     {
-        $nodeNames = (array) $nodeNames;
-        foreach ($nodeNames as $nodeName) {
+        $selectors = (array) $selectors;
+        foreach ($selectors as $nodeName) {
+            $transformerClone = null;
             if (!preg_match('/^[a-z]$/i', $nodeName)) {
-                if (preg_match('/^([a-z]*)(?:#([a-z0-9_-]+))?((?:\.[a-z0-9_-]+)*)$/', $nodeName, $matches)) {
-                    $nodeName = $matches[1] ?: '*';
-                    $id = $matches[2];
-                    if (!empty($id)) {
-                        $transformer->addConstraint(new HasAttributeConstraint('id', $id));
-                    }
-                    $classes = array_filter(explode('.', trim($matches[3], '.')));
-                    if (!empty($classes)) {
-                        $transformer->addConstraint(new HasClassConstraint($classes));
-                    }
-                } else {
+                if (!preg_match('/^([a-z]*)(?:#([a-z0-9_-]+))?((?:\.[a-z0-9_-]+)*)$/', $nodeName, $matches)) {
                     throw new InvalidArgumentException(sprintf('Invalid node selector: `%s`', $nodeName));
+                }
+                // Prevent adding constraints that would affect other selectors
+                $transformerClone = clone $transformer;
+
+                $nodeName = $matches[1] ?: '*';
+                $id = $matches[2];
+                if (!empty($id)) {
+                    $transformerClone->addConstraint(new HasAttributeConstraint('id', $id));
+                }
+                $classes = array_filter(explode('.', trim($matches[3], '.')));
+                if (!empty($classes)) {
+                    $transformerClone->addConstraint(new HasClassConstraint($classes));
                 }
             }
 
-            parent::addListener($nodeName, array($transformer, 'transform'), $priority);
+            parent::addListener($nodeName, array($transformerClone ?: $transformer, 'transform'), $priority);
         }
     }
 
@@ -50,8 +53,8 @@ class EventDispatcher extends BaseDispatcher
     protected function doDispatch($listeners, $eventName, Event $event)
     {
         foreach ($listeners as $listener) {
-            if ($listener instanceof TransformerInterface && $event instanceof TranscodeElementEvent) {
-                $constraints = $listener->getConstraints();
+            if (is_array($listener) && $listener[0] instanceof TransformerInterface && $event instanceof TranscodeElementEvent) {
+                $constraints = $listener[0]->getConstraints();
                 foreach ($constraints as $constraint) {
                     if ($constraint->constrain($event->getNode())) {
                         continue(2);

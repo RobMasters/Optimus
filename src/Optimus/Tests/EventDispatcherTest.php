@@ -4,6 +4,7 @@ namespace Optimus\Tests;
 
 use Optimus\EventDispatcher;
 use \Mockery as m;
+use Optimus\Transformer\TransformerInterface;
 
 class EventDispatcherTest extends \PHPUnit_Framework_TestCase
 {
@@ -116,6 +117,24 @@ class EventDispatcherTest extends \PHPUnit_Framework_TestCase
 
         $this->dispatcher->addTransformer('#container', $transformer);
         $this->assertCount(1, $this->dispatcher->getListeners('*'));
+    }
+
+    /**
+     * @test
+     * @covers addTransformer
+     */
+    public function testAddTransformer_clonesTransformerWhenApplyingAutomaticConstraints()
+    {
+        $transformer = $this->getMockTransformer();
+        $transformer->shouldReceive('addConstraint')->with(m::type('\Optimus\Constraint\HasAttributeConstraint'));
+
+        $this->dispatcher->addTransformer(array('#container', 'div.container'), $transformer);
+
+        $wildcardListeners = $this->dispatcher->getListeners('*');
+        $divListeners = $this->dispatcher->getListeners('div');
+
+        $this->assertCount(1, $wildcardListeners);
+        $this->assertCount(1, $divListeners);
     }
 
     /**
