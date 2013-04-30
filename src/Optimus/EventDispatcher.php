@@ -56,7 +56,7 @@ class EventDispatcher extends BaseDispatcher
             if (is_array($listener) && $listener[0] instanceof TransformerInterface && $event instanceof TranscodeElementEvent) {
                 $constraints = $listener[0]->getConstraints();
                 foreach ($constraints as $constraint) {
-                    if ($constraint->constrain($event->getNode())) {
+                    if (!$constraint->check($event->getNode())) {
                         continue(2);
                     }
                 }

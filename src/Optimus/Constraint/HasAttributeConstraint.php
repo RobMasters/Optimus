@@ -24,15 +24,18 @@ class HasAttributeConstraint implements ConstraintInterface
      * @param \DOMElement $node
      * @return bool
      */
-    public function constrain(\DOMElement $node)
+    public function check(\DOMElement $node)
     {
         if (!$this->getSubject($node)->hasAttribute($this->attribute)) {
             return false;
         }
 
-        $value = $this->getSubject($node)->getAttribute($this->attribute);
+        if (is_null($this->value)) {
+            // Only checking the attribute exists, which it does
+            return true;
+        }
 
-        return (!is_null($this->value)) ? $this->checkValue($value) : false;
+        return $this->checkValue($this->getSubject($node)->getAttribute($this->attribute));
     }
 
     /**

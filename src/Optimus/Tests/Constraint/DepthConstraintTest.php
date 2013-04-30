@@ -29,9 +29,9 @@ class DepthConstraintTest extends \PHPUnit_Framework_TestCase
     public function minimumDepthProvider()
     {
         return array(
-            array(4, true),
-            array(3, false),
-            array(2, false)
+            array(4, false),
+            array(3, true),
+            array(2, true)
         );
     }
 
@@ -47,7 +47,7 @@ class DepthConstraintTest extends \PHPUnit_Framework_TestCase
         $node = $this->document->getElementsByTagName('ul')->item(0); // depth = 3 (html > body > div > ul)
 
         $this->constraint->setMinimum($minimumDepth);
-        $this->assertEquals($expected, $this->constraint->constrain($node));
+        $this->assertEquals($expected, $this->constraint->check($node));
     }
 
     /**
@@ -56,9 +56,9 @@ class DepthConstraintTest extends \PHPUnit_Framework_TestCase
     public function maximumDepthProvider()
     {
         return array(
-            array(2, true),
-            array(3, false),
-            array(4, false)
+            array(2, false),
+            array(3, true),
+            array(4, true)
         );
     }
 
@@ -74,7 +74,7 @@ class DepthConstraintTest extends \PHPUnit_Framework_TestCase
         $node = $this->document->getElementsByTagName('ul')->item(0); // depth = 3 (html > body > div > ul)
 
         $this->constraint->setMaximum($maximumDepth);
-        $this->assertEquals($expected, $this->constraint->constrain($node));
+        $this->assertEquals($expected, $this->constraint->check($node));
     }
 
     /**
@@ -89,7 +89,7 @@ class DepthConstraintTest extends \PHPUnit_Framework_TestCase
 
         $this->constraint->setMinimum(5);
         $this->constraint->setMaximum(5);
-        $this->constraint->constrain(new \DOMElement('div'));
+        $this->constraint->check(new \DOMElement('div'));
     }
 
     /**
@@ -104,33 +104,6 @@ class DepthConstraintTest extends \PHPUnit_Framework_TestCase
 
         $this->constraint->setMinimum(5);
         $this->constraint->setMaximum(4);
-        $this->constraint->constrain(new \DOMElement('div'));
-    }
-
-    public function eventNameProvider()
-    {
-        return array(
-            array('div'),
-            array('div.badger'),
-            array('div.badger.monkey'),
-            array('div#beaver.badger'),
-            array('div#beaver.badger.monkey'),
-            array('#beaver.badger.monkey'),
-            array('div.badger li.monkey')
-        );
-    }
-
-    /**
-     * @dataProvider eventNameProvider
-     */
-    public function testNothing($eventName)
-    {
-        if (preg_match('/^([a-z]*)(?:#([a-z0-9_-]+))?((?:\.[a-z0-9_-]+)*)$/', $eventName, $matches)) {
-            $tag = $matches[1];
-            $id = $matches[2];
-            $classes = explode('.', trim($matches[3], '.'));
-            $a = 1;
-        }
-        $this->assertTrue(true);
+        $this->constraint->check(new \DOMElement('div'));
     }
 }

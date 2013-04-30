@@ -47,7 +47,7 @@ class DepthConstraint implements ConstraintInterface
      * @throws \Optimus\Exception\ConstraintException
      * @return bool
      */
-    public function constrain(\DOMElement $node)
+    public function check(\DOMElement $node)
     {
         if (!empty($this->minimum) && (!empty($this->maximum)) && ($this->minimum >= $this->maximum)) {
             throw new ConstraintException('If specifying the minimum and maximum depth, the minimum must be lower than the maximum');
@@ -56,14 +56,14 @@ class DepthConstraint implements ConstraintInterface
         $depth = $this->getDepth($node);
 
         if (!empty($this->minimum) && $this->minimum > $depth) {
-            return true;
+            return false;
         }
 
         if (!empty($this->maximum) && $this->maximum < $depth) {
-            return true;
+            return false;
         }
 
-        return false;
+        return true;
     }
 
     /**
