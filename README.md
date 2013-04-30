@@ -1,9 +1,9 @@
 Optimus
 =======
 
-_Optimus is the prime server-side way to transform a DOM_
-
 [![Build Status](https://secure.travis-ci.org/RobMasters/Optimus.png?branch=master)](http://travis-ci.org/RobMasters/Optimus)
+
+_The prime server-side way to manage DOM transformations_
 
 ## Installation
 
