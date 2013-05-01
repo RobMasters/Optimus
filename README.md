@@ -47,7 +47,7 @@ which can be anything that is callable. e.g.
 use Optimus\Event\TranscodeElementEvent;
 
 # Remove all script nodes from the DOMDocument.
-$dispatcher->addListener('div', function(TranscodeElementEvent $event) {
+$dispatcher->addListener('script', function(TranscodeElementEvent $event) {
   $event->removeNode(); // also stops propagation as there's no point continuing
 });
 
