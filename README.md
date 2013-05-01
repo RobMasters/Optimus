@@ -142,7 +142,7 @@ use Optimus\Constraint\CompositeConstraint,
     Optimus\Constraint\HasClassConstraint;
 
 # Listen to <ul> tags that have 'nav' anywhere in their id, or have a 'nav' class
-$idConstraint = new HasAttributeConstraint('id', 'container');
+$idConstraint = new HasAttributeConstraint('id');
 $idConstraint->setPattern('/nav/');
 $transformer->addConstraint(new CompositeConstraint([
     $idConstraint,
