@@ -57,7 +57,7 @@ $dispatcher->addListener('*', function(TranscodeElementEvent $event) {
   $node = $event->getNode();
 
   if ($node->nodeName === 'script') {
-    throw new \Exception('This should never get thrown as the specific div listener is stopping propagation');
+    throw new \Exception('This should never get thrown as the node-specific listener is stopping propagation');
   }
 
   // your custom logic
