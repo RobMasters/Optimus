@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
+
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <title>Optimus by RobMasters</title>
+  </head>
+
+  <body>
+    <header>
+      <div class="inner">
+        <h1>Optimus</h1>
+        <h2>DOM Transcoder</h2>
+        <a href="https://github.com/RobMasters/Optimus" class="button"><small>View project on</small>GitHub</a>
+      </div>
+    </header>
+
+    <div id="content-wrapper">
+      <div class="inner clearfix">
+        <section id="main-content">
+          <h1>Optimus</h1>
+
+<p><a href="http://travis-ci.org/RobMasters/Optimus"><img src="https://secure.travis-ci.org/RobMasters/Optimus.png?branch=master" alt="Build Status"></a></p>
+
+<p><em>The prime server-side way to manage DOM transformations</em></p>
+
+<h2>Installation</h2>
+
+<pre><code>$ git clone https://github.com/RobMasters/Optimus.git
+$ cd Optimus
+
+$ curl -sS https://getcomposer.org/installer | php
+$ php composer.phar install
+
+</code></pre>
+
+<h2>Usage</h2>
+
+<h3>Overview</h3>
+
+<p>Here is the minimum that is required. You'll need to construct the Transcoder with a \Optimus\EventDispatcher instance
+and provide it with a \DOMDocument. You can configure as many listeners/transforms as you want and add them to the
+event dispatcher. Then you can fetch the transcoded output from the Transcoder.</p>
+
+<div class="highlight"><pre><span class="k">use</span> <span class="nx">Optimus\EventDispatcher</span><span class="p">,</span>
+    <span class="nx">Optimus\Transcoder</span><span class="p">;</span>
+
+<span class="nv">$dispatcher</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">EventDispatcher</span><span class="p">();</span>
+<span class="nv">$transcoder</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Transcoder</span><span class="p">(</span><span class="nv">$dispatcher</span><span class="p">);</span>
+<span class="nv">$transcoder</span><span class="o">-&gt;</span><span class="na">setDocument</span><span class="p">(</span><span class="nv">$domDocument</span><span class="p">);</span> <span class="c1">// $domDocument is obtained elsewhere</span>
+
+<span class="c1">// Add your listeners/transformers to the event dispatcher...</span>
+
+<span class="sd">/** @var \DOMDocument $output */</span>
+<span class="nv">$output</span> <span class="o">=</span> <span class="nv">$transcoder</span><span class="o">-&gt;</span><span class="na">transcode</span><span class="p">();</span>
+</pre></div>
+
+<h3>Adding custom listeners</h3>
+
+<p>Because the Event Dispatcher directly extends the Symfony2 EventDispatcher component you're able to add your own listeners,
+which can be anything that is callable. e.g.</p>
+
+<div class="highlight"><pre><span class="k">use</span> <span class="nx">Optimus\Event\TranscodeElementEvent</span><span class="p">;</span>
+
+<span class="c1"># Remove all script nodes from the DOMDocument.</span>
+<span class="nv">$dispatcher</span><span class="o">-&gt;</span><span class="na">addListener</span><span class="p">(</span><span class="s1">'div'</span><span class="p">,</span> <span class="k">function</span><span class="p">(</span><span class="nx">TranscodeElementEvent</span> <span class="nv">$event</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nv">$event</span><span class="o">-&gt;</span><span class="na">removeNode</span><span class="p">();</span> <span class="c1">// also stops propagation as there's no point continuing</span>
+<span class="p">});</span>
+
+<span class="c1"># Listen for all nodes in the DOMDocument. NOTE: this does not include text nodes</span>
+<span class="nv">$dispatcher</span><span class="o">-&gt;</span><span class="na">addListener</span><span class="p">(</span><span class="s1">'*'</span><span class="p">,</span> <span class="k">function</span><span class="p">(</span><span class="nx">TranscodeElementEvent</span> <span class="nv">$event</span><span class="p">)</span> <span class="p">{</span>
+  <span class="sd">/** @var \DOMElement $node **/</span>
+  <span class="nv">$node</span> <span class="o">=</span> <span class="nv">$event</span><span class="o">-&gt;</span><span class="na">getNode</span><span class="p">();</span>
+
+  <span class="k">if</span> <span class="p">(</span><span class="nv">$node</span><span class="o">-&gt;</span><span class="na">nodeName</span> <span class="o">===</span> <span class="s1">'script'</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">throw</span> <span class="k">new</span> <span class="nx">\Exception</span><span class="p">(</span><span class="s1">'This should never get thrown as the specific div listener is stopping propagation'</span><span class="p">);</span>
+  <span class="p">}</span>
+
+  <span class="c1">// your custom logic</span>
+  <span class="nv">$node</span><span class="o">-&gt;</span><span class="na">setAttribute</span><span class="p">(</span><span class="s1">'data-transcoded'</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+<span class="p">});</span>
+</pre></div>
+
+<p>The event name to listen to is the name of the node (i.e. 'div' or 'ul') or a wilcard character, '*', which can be used to
+listen to all element nodes. This 'wildcard' event is dispatched after the specific one for the node and uses  the same
+event instance, so if the propagation was stopped in a listener to the 'node name' event then the wildcard event will not
+be dispatched.</p>
+
+<h3>Adding Transformers</h3>
+
+<p>A simpler option is to use a Transformer object. For example:</p>
+
+<div class="highlight"><pre><span class="k">use</span> <span class="nx">Optimus\Transformer\AddPositionClassTransformer</span><span class="p">;</span>
+
+<span class="c1"># Transform all nodes in the DOMDocument</span>
+<span class="nv">$dispatcher</span><span class="o">-&gt;</span><span class="na">addTransformer</span><span class="p">(</span><span class="s1">'*'</span><span class="p">,</span> <span class="k">new</span> <span class="nx">AddPositionClassTransformer</span><span class="p">());</span>
+</pre></div>
+
+<p>This method also allows you to specify multiple selectors at once for convenience. Behind the scenes this will add a listener
+for each selector given. e.g.</p>
+
+<div class="highlight"><pre><span class="k">use</span> <span class="nx">Optimus\Transformer\AddPositionClassTransformer</span><span class="p">;</span>
+
+<span class="c1"># Add position classes to all &lt;div&gt; and &lt;li&gt; nodes in the document</span>
+<span class="nv">$transformer</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">AddPositionClassTransformer</span><span class="p">();</span>
+<span class="nv">$dispatcher</span><span class="o">-&gt;</span><span class="na">addTransformer</span><span class="p">([</span><span class="s1">'div'</span><span class="p">,</span> <span class="s1">'li'</span><span class="p">],</span> <span class="nv">$transformer</span><span class="p">);</span>
+</pre></div>
+
+<h3>Using Constraints to control when a Transformer will be applied</h3>
+
+<p>The main benefit to using a Transformer rather than any other listener is that it allows you much greater control over
+when the Transformer is dispatched events. This is achieved by configuring any number of Constraint objects and adding
+them to the Transformer. e.g.</p>
+
+<div class="highlight"><pre><span class="k">use</span> <span class="nx">Optimus\Constraint\DepthConstraint</span><span class="p">;</span>
+
+<span class="c1"># Only transform nodes that are nested at least 5 levels deep in the DOM, but no more than 10,</span>
+<span class="nv">$transformer</span><span class="o">-&gt;</span><span class="na">addConstraint</span><span class="p">(</span><span class="k">new</span> <span class="nx">DepthConstraint</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">));</span>
+<span class="nv">$dispatcher</span><span class="o">-&gt;</span><span class="na">addTransformer</span><span class="p">(</span><span class="s1">'*'</span><span class="p">,</span> <span class="nv">$transformer</span><span class="p">);</span>
+</pre></div>
+
+<p>For added convenience, certain constraints can be added by specifying them as a CSS selector when adding the Transformer
+to the Event Dispatcher. e.g.</p>
+
+<div class="highlight"><pre><span class="k">use</span> <span class="nx">Optimus\Constraint\HasAttributeConstraint</span><span class="p">,</span>
+    <span class="nx">Optimus\Constraint\HasClassConstraint</span><span class="p">;</span>
+
+<span class="c1"># Adding an id constraint for any tag</span>
+<span class="nv">$transformer</span><span class="o">-&gt;</span><span class="na">addConstraint</span><span class="p">(</span><span class="k">new</span> <span class="nx">HasAttributeConstraint</span><span class="p">(</span><span class="s1">'id'</span><span class="p">,</span> <span class="s1">'container'</span><span class="p">));</span>
+<span class="nv">$dispatcher</span><span class="o">-&gt;</span><span class="na">addTransformer</span><span class="p">(</span><span class="s1">'*'</span><span class="p">,</span> <span class="nv">$transformer</span><span class="p">);</span>
+
+<span class="c1">// ...can be written shorter as:</span>
+<span class="nv">$dispatcher</span><span class="o">-&gt;</span><span class="na">addTransformer</span><span class="p">(</span><span class="s1">'#container'</span><span class="p">,</span> <span class="nv">$transformer</span><span class="p">);</span>
+
+
+<span class="c1"># Adding class constraint(s) for &lt;li&gt; tags</span>
+<span class="nv">$transformer</span><span class="o">-&gt;</span><span class="na">addConstraint</span><span class="p">(</span><span class="k">new</span> <span class="nx">HasClassConstraint</span><span class="p">([</span><span class="s1">'first'</span><span class="p">,</span> <span class="s1">'selected'</span><span class="p">]));</span>
+<span class="nv">$dispatcher</span><span class="o">-&gt;</span><span class="na">addTransformer</span><span class="p">(</span><span class="s1">'li'</span><span class="p">,</span> <span class="nv">$transformer</span><span class="p">);</span>
+
+<span class="c1">// ...can be written shorter as:</span>
+<span class="nv">$dispatcher</span><span class="o">-&gt;</span><span class="na">addTransformer</span><span class="p">(</span><span class="s1">'li.first.selected'</span><span class="p">,</span> <span class="nv">$transformer</span><span class="p">);</span>
+</pre></div>
+
+<h3>Combining Constraints in a Composite for even greater control</h3>
+
+<p>You'll only be able to achieve so much by adding individual Constraints to a Transformer that all need to be satisfied.
+It's likely there will be times when you want to transform a node if one of any number of conditions are met, and this can
+be achieved by adding any number of Constraints to the CompositeConstraint. As the name implies this also implements the
+Optimus\Constraint\ConstraintInterface so it can be added to a Transformer the same as any other Constraint. e.g.</p>
+
+<div class="highlight"><pre><span class="k">use</span> <span class="nx">Optimus\Constraint\CompositeConstraint</span><span class="p">,</span>
+    <span class="nx">Optimus\Constraint\HasAttributeConstraint</span><span class="p">,</span>
+    <span class="nx">Optimus\Constraint\HasClassConstraint</span><span class="p">;</span>
+
+<span class="c1"># Listen to &lt;ul&gt; tags that have 'nav' anywhere in their id, or have a 'nav' class</span>
+<span class="nv">$idConstraint</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">HasAttributeConstraint</span><span class="p">(</span><span class="s1">'id'</span><span class="p">);</span>
+<span class="nv">$idConstraint</span><span class="o">-&gt;</span><span class="na">setPattern</span><span class="p">(</span><span class="s1">'/nav/'</span><span class="p">);</span>
+<span class="nv">$transformer</span><span class="o">-&gt;</span><span class="na">addConstraint</span><span class="p">(</span><span class="k">new</span> <span class="nx">CompositeConstraint</span><span class="p">([</span>
+    <span class="nv">$idConstraint</span><span class="p">,</span>
+    <span class="k">new</span> <span class="nx">HasClassConstraint</span><span class="p">(</span><span class="s1">'nav'</span><span class="p">)</span>
+<span class="p">]));</span>
+</pre></div>
+
+<p>By default the CompositeConstraint uses the <code>CompositeConstraint::MODE_ANY</code> mode; it will return true if any of the Constraints
+given to it are satisfied. There are two other modes to choose from: <code>CompositeConstraint::MODE_ALL</code> or <code>CompositeConstraint::MODE_NONE</code>.
+MODE_ALL is probably going to be the least used as this is the default behaviour when adding Constraints directly to a
+Transformer - it is really only necessary when nesting CompositeConstraints inside each other. MODE_NONE, on the other hand,
+is very useful as it allows you to specify when a Transformer should NOT be applied. e.g.</p>
+
+<div class="highlight"><pre><span class="k">use</span> <span class="nx">Optimus\Constraint\CompositeConstraint</span><span class="p">,</span>
+    <span class="nx">Optimus\Constraint\HasAttributeConstraint</span><span class="p">;</span>
+
+<span class="c1"># Listen to all &lt;input&gt; nodes except checkboxes and radio buttons</span>
+<span class="nv">$compositeConstraint</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">CompositeConstraint</span><span class="p">();</span>
+<span class="nv">$compositeConstraint</span>
+    <span class="o">-&gt;</span><span class="na">setMode</span><span class="p">(</span><span class="nx">CompositeConstraint</span><span class="o">::</span><span class="na">MODE_NONE</span><span class="p">)</span>
+    <span class="o">-&gt;</span><span class="na">addConstraint</span><span class="p">(</span><span class="k">new</span> <span class="nx">HasAttributeConstraint</span><span class="p">(</span><span class="s1">'type'</span><span class="p">,</span> <span class="s1">'checkbox'</span><span class="p">))</span>
+    <span class="o">-&gt;</span><span class="na">addConstraint</span><span class="p">(</span><span class="k">new</span> <span class="nx">HasAttributeConstraint</span><span class="p">(</span><span class="s1">'type'</span><span class="p">,</span> <span class="s1">'radio'</span><span class="p">))</span>
+<span class="p">;</span>
+<span class="nv">$transformer</span><span class="o">-&gt;</span><span class="na">addConstraint</span><span class="p">(</span><span class="nv">$compositeConstraint</span><span class="p">);</span>
+<span class="nv">$dispatcher</span><span class="o">-&gt;</span><span class="na">addTransformer</span><span class="p">(</span><span class="s1">'input'</span><span class="p">,</span> <span class="nv">$transformer</span><span class="p">);</span>
+</pre></div>
+
+<h2>Testing</h2>
+
+<p>First, you must ensure you've installed all of the dev dependencies via composer:</p>
+
+<pre><code>$ php composer.phar install --dev
+
+</code></pre>
+
+<p>Then simply run the phpunit executable in the vendor directory:</p>
+
+<pre><code>$ vendor/bin/phpunit
+</code></pre>
+        </section>
+
+        <aside id="sidebar">
+          <a href="https://github.com/RobMasters/Optimus/zipball/master" class="button">
+            <small>Download</small>
+            .zip file
+          </a>
+          <a href="https://github.com/RobMasters/Optimus/tarball/master" class="button">
+            <small>Download</small>
+            .tar.gz file
+          </a>
+
+          <p class="repo-owner"><a href="https://github.com/RobMasters/Optimus"></a> is maintained by <a href="https://github.com/RobMasters">RobMasters</a>.</p>
+
+          <p>This page was generated by <a href="pages.github.com">GitHub Pages</a> using the Architect theme by <a href="http://twitter.com/jasonlong">Jason Long</a>.</p>
+        </aside>
+      </div>
+    </div>
+
+  
+  </body>
+</html>
