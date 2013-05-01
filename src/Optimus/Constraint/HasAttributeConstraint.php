@@ -14,10 +14,30 @@ class HasAttributeConstraint implements ConstraintInterface
      */
     protected $value;
 
+    /**
+     * @var null|string
+     */
+    protected $pattern;
+
+    /**
+     * @param $attribute
+     * @param null $value
+     */
     function __construct($attribute, $value = null)
     {
         $this->attribute = $attribute;
         $this->value = $value;
+    }
+
+    /**
+     * @param string $pattern
+     * @return $this
+     */
+    public function setPattern($pattern)
+    {
+        $this->pattern = $pattern;
+
+        return $this;
     }
 
     /**
@@ -30,8 +50,8 @@ class HasAttributeConstraint implements ConstraintInterface
             return false;
         }
 
-        if (is_null($this->value)) {
-            // Only checking the attribute exists, which it does
+        if (is_null($this->value) && is_null($this->pattern)) {
+            // Only checking the attribute exists, which it must do at this point
             return true;
         }
 
@@ -44,6 +64,10 @@ class HasAttributeConstraint implements ConstraintInterface
      */
     protected function checkValue($value)
     {
+        if (!empty($this->pattern)) {
+            return (bool) preg_match($this->pattern, $value);
+        }
+
         return $value === $this->value;
     }
 

@@ -9,7 +9,7 @@ class HasAttributeConstraintTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function testConstrain_returnsTrue_whenAttributeExists()
+    public function testCheck_returnsTrue_whenAttributeExists()
     {
         $document = $this->getDocument();
         $element = $document->getElementById('list');
@@ -21,7 +21,7 @@ class HasAttributeConstraintTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function testConstrain_returnsFalse_whenAttributeDoesNotExist()
+    public function testCheck_returnsFalse_whenAttributeDoesNotExist()
     {
         $document = $this->getDocument();
         $element = $document->getElementById('list');
@@ -33,7 +33,7 @@ class HasAttributeConstraintTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function testConstrain_returnsTrue_whenAttributeExistsAndMatchesValue()
+    public function testCheck_returnsTrue_whenAttributeExistsAndMatchesValue()
     {
         $document = $this->getDocument();
         $element = $document->getElementById('list');
@@ -45,7 +45,7 @@ class HasAttributeConstraintTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function testConstrain_returnsFalse_whenAttributeExistsButDoesNotMatchValue()
+    public function testCheck_returnsFalse_whenAttributeExistsButDoesNotMatchValue()
     {
         $document = $this->getDocument();
         $element = $document->getElementById('list');
@@ -57,7 +57,7 @@ class HasAttributeConstraintTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function testConstrain_returnsTrue_whenAttributeExistsAndClassIsMatchedExactly()
+    public function testCheck_returnsTrue_whenAttributeExistsAndClassIsMatchedExactly()
     {
         $document = $this->getDocument();
         $element = $document->getElementById('wrapper');
@@ -69,7 +69,7 @@ class HasAttributeConstraintTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function testConstrain_returnsFalse_whenAttributeExistsButOnlySingleClassNameMatches()
+    public function testCheck_returnsFalse_whenAttributeExistsButOnlySingleClassNameMatches()
     {
         $document = $this->getDocument();
         $element = $document->getElementById('wrapper');
@@ -81,12 +81,38 @@ class HasAttributeConstraintTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function testConstrain_returnsFalse_whenAttributeExistsAndClassesExistButInDifferentOrder()
+    public function testCheck_returnsFalse_whenAttributeExistsAndClassesExistButInDifferentOrder()
     {
         $document = $this->getDocument();
         $element = $document->getElementById('wrapper');
 
         $constraint = new HasAttributeConstraint('class', 'small-text container');
+        $this->assertFalse($constraint->check($element));
+    }
+
+    /**
+     * @test
+     */
+    public function testCheck_returnsTrue_whenAttributeExistsAndMatchesPattern()
+    {
+        $document = $this->getDocument();
+        $element = $document->getElementById('wrapper');
+
+        $constraint = new HasAttributeConstraint('class');
+        $constraint->setPattern('/small/');
+        $this->assertTrue($constraint->check($element));
+    }
+
+    /**
+     * @test
+     */
+    public function testCheck_returnsFalse_whenAttributeExistsButDoesNotMatchPattern()
+    {
+        $document = $this->getDocument();
+        $element = $document->getElementById('wrapper');
+
+        $constraint = new HasAttributeConstraint('class');
+        $constraint->setPattern('/(first|last)/');
         $this->assertFalse($constraint->check($element));
     }
 
