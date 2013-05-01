@@ -44,12 +44,15 @@ class CompositeConstraint implements ConstraintInterface
             throw new ConstraintException('CompositeConstraint must contain at least one constraint');
         }
 
-        $results = array();
         foreach ($this->constraints as $constraint) {
-            $results[] = $result = $constraint->check($node);
+            $result = $constraint->check($node);
 
             if (!$result && $this->mode === self::MODE_ALL) {
                 return false;
+            }
+
+            if ($result && $this->mode === self::MODE_ANY) {
+                return true;
             }
 
             if ($result && $this->mode === self::MODE_NONE) {
@@ -57,11 +60,7 @@ class CompositeConstraint implements ConstraintInterface
             }
         }
 
-        if ($this->mode === self::MODE_ANY && !in_array(true, $results)) {
-            return false;
-        }
-
-        return true;
+        return ($this->mode !== self::MODE_ANY);
     }
 
     /**
