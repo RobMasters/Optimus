@@ -73,7 +73,7 @@ which can be anything that is callable. e.g.</p>
 <div class="highlight"><pre><span class="k">use</span> <span class="nx">Optimus\Event\TranscodeElementEvent</span><span class="p">;</span>
 
 <span class="c1"># Remove all script nodes from the DOMDocument.</span>
-<span class="nv">$dispatcher</span><span class="o">-&gt;</span><span class="na">addListener</span><span class="p">(</span><span class="s1">'div'</span><span class="p">,</span> <span class="k">function</span><span class="p">(</span><span class="nx">TranscodeElementEvent</span> <span class="nv">$event</span><span class="p">)</span> <span class="p">{</span>
+<span class="nv">$dispatcher</span><span class="o">-&gt;</span><span class="na">addListener</span><span class="p">(</span><span class="s1">'script'</span><span class="p">,</span> <span class="k">function</span><span class="p">(</span><span class="nx">TranscodeElementEvent</span> <span class="nv">$event</span><span class="p">)</span> <span class="p">{</span>
   <span class="nv">$event</span><span class="o">-&gt;</span><span class="na">removeNode</span><span class="p">();</span> <span class="c1">// also stops propagation as there's no point continuing</span>
 <span class="p">});</span>
 
