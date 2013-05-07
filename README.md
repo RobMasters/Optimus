@@ -29,8 +29,7 @@ use Optimus\EventDispatcher,
     Optimus\Transcoder;
 
 $dispatcher = new EventDispatcher();
-$transcoder = new Transcoder($dispatcher);
-$transcoder->setDocument($domDocument); // $domDocument is obtained elsewhere
+$transcoder = new Transcoder($dispatcher, $adapter); // $adapter implements Optimus\Adapter\AdapterInterface
 
 // Add your listeners/transformers to the event dispatcher...
 
