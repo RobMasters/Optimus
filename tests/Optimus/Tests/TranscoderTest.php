@@ -5,6 +5,7 @@ namespace Optimus\Tests;
 use Optimus\Event\TranscodeNodeEvent;
 use Optimus\Transcoder;
 use Optimus\EventDispatcher;
+use \Mockery as m;
 
 class TranscoderTest extends \PHPUnit_Framework_TestCase
 {
@@ -24,6 +25,11 @@ class TranscoderTest extends \PHPUnit_Framework_TestCase
         $this->transcoder = new Transcoder($this->dispatcher);
     }
 
+    protected function tearDown()
+    {
+        m::close();
+    }
+
     /**
      * @test
      */
@@ -39,7 +45,7 @@ class TranscoderTest extends \PHPUnit_Framework_TestCase
         });
 
         $this->transcoder
-            ->setDocument($this->getDocument())
+            ->setAdapter($this->getMockAdapter())
             ->transcode()
         ;
 
@@ -61,7 +67,7 @@ class TranscoderTest extends \PHPUnit_Framework_TestCase
         });
 
         $this->transcoder
-            ->setDocument($this->getDocument())
+            ->setAdapter($this->getMockAdapter())
             ->transcode()
         ;
 
@@ -85,7 +91,7 @@ class TranscoderTest extends \PHPUnit_Framework_TestCase
         });
 
         $this->transcoder
-            ->setDocument($this->getDocument())
+            ->setAdapter($this->getMockAdapter())
             ->transcode()
         ;
 
@@ -95,9 +101,8 @@ class TranscoderTest extends \PHPUnit_Framework_TestCase
     /**
      * @return \DOMDocument
      */
-    protected function getDocument()
+    protected function getMockAdapter()
     {
-        $dom = new \DOMDocument();
         $html = <<<ENDHTML
 <html>
     <head></head>
@@ -114,8 +119,11 @@ class TranscoderTest extends \PHPUnit_Framework_TestCase
 </html>
 ENDHTML;
 
-        $dom->loadHTML($html);
+        $document = new \DOMDocument();
+        $document->loadHTML($html);
 
-        return $dom;
+        return m::mock('Optimus\Adapter\AdapterInterface', array(
+            'getDocument' => $document
+        ));
     }
 }

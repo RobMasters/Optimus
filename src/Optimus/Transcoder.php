@@ -2,8 +2,8 @@
 
 namespace Optimus;
 
+use Optimus\Adapter\AdapterInterface;
 use Optimus\Event\TranscodeElementEvent;
-use Optimus\Event\TranscodeNodeEvent;
 use Optimus\Event\TranscodeTextEvent;
 use Optimus\EventDispatcher;
 
@@ -16,25 +16,27 @@ class Transcoder
     protected $dispatcher;
 
     /**
-     * @var \DOMDocument
+     * @var Adapter\AdapterInterface
      */
-    protected $dom;
+    protected $adapter;
 
     /**
      * @param \Optimus\EventDispatcher $dispatcher
+     * @param \Optimus\Adapter\AdapterInterface $adapter
      */
-    function __construct(EventDispatcher $dispatcher)
+    function __construct(EventDispatcher $dispatcher, AdapterInterface $adapter = null)
     {
         $this->dispatcher = $dispatcher;
+        $this->adapter = $adapter;
     }
 
     /**
-     * @param \DOMDocument $dom
+     * @param AdapterInterface $adapter
      * @return $this
      */
-    public function setDocument(\DOMDocument $dom)
+    public function setAdapter(AdapterInterface $adapter)
     {
-        $this->dom = $dom;
+        $this->adapter = $adapter;
 
         return $this;
     }
@@ -44,9 +46,10 @@ class Transcoder
      */
     public function transcode()
     {
-        $this->transcodeList($this->dom->childNodes);
+        $dom = $this->adapter->getDocument();
+        $this->transcodeList($dom->childNodes);
 
-        return $this->dom;
+        return $dom;
     }
 
     /**
@@ -82,17 +85,17 @@ class Transcoder
     }
 
     /**
-     * @param TranscodeNodeEvent $event
+     * @param TranscodeTextEvent $event
      */
-    protected function transcodeTextNode(TranscodeNodeEvent $event)
+    protected function transcodeTextNode(TranscodeTextEvent $event)
     {
         $this->dispatcher->dispatch('text', $event);
     }
 
     /**
-     * @param TranscodeNodeEvent $event
+     * @param TranscodeElementEvent $event
      */
-    protected function transcodeElementNode(TranscodeNodeEvent $event)
+    protected function transcodeElementNode(TranscodeElementEvent $event)
     {
         $node = $event->getNode();
         $this->dispatcher->dispatch($node->nodeName, $event);

@@ -21,16 +21,16 @@ class EventDispatcher extends BaseDispatcher
     public function addTransformer($selectors, TransformerInterface $transformer, $priority = 0)
     {
         $selectors = (array) $selectors;
-        foreach ($selectors as $nodeName) {
+        foreach ($selectors as $selector) {
             $transformerClone = null;
-            if (!preg_match('/^[a-z]$/i', $nodeName)) {
-                if (!preg_match('/^([a-z]*)(?:#([a-z0-9_-]+))?((?:\.[a-z0-9_-]+)*)$/', $nodeName, $matches)) {
-                    throw new InvalidArgumentException(sprintf('Invalid node selector: `%s`', $nodeName));
+            if (!preg_match('/^[a-z]$/i', $selector)) {
+                if (!preg_match('/^([a-z]*)(?:#([a-z0-9_-]+))?((?:\.[a-z0-9_-]+)*)$/', $selector, $matches)) {
+                    throw new InvalidArgumentException(sprintf('Invalid node selector: `%s`', $selector));
                 }
                 // Prevent adding constraints that would affect other selectors
                 $transformerClone = clone $transformer;
 
-                $nodeName = $matches[1] ?: '*';
+                $selector = $matches[1] ?: '*';
                 $id = $matches[2];
                 if (!empty($id)) {
                     $transformerClone->addConstraint(new HasAttributeConstraint('id', $id));
@@ -41,7 +41,7 @@ class EventDispatcher extends BaseDispatcher
                 }
             }
 
-            parent::addListener($nodeName, array($transformerClone ?: $transformer, 'transform'), $priority);
+            parent::addListener($selector, array($transformerClone ?: $transformer, 'transform'), $priority);
         }
     }
 
