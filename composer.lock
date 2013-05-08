@@ -161,12 +161,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/padraic/mockery.git",
-                "reference": "7e72479b5416b95175e0d5a1ed479dce08a7645e"
+                "reference": "28c77695ac5167e533f86e0268c0a83ef1ac693a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/padraic/mockery/zipball/7e72479b5416b95175e0d5a1ed479dce08a7645e",
-                "reference": "7e72479b5416b95175e0d5a1ed479dce08a7645e",
+                "url": "https://api.github.com/repos/padraic/mockery/zipball/28c77695ac5167e533f86e0268c0a83ef1ac693a",
+                "reference": "28c77695ac5167e533f86e0268c0a83ef1ac693a",
                 "shasum": ""
             },
             "require": {
@@ -207,7 +207,7 @@
                 "test double",
                 "testing"
             ],
-            "time": "2013-05-07 20:12:42"
+            "time": "2013-05-08 16:54:26"
         },
         {
             "name": "phpunit/php-code-coverage",

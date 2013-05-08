@@ -6,9 +6,9 @@ use Guzzle\Http\Client;
 use Guzzle\Http\Message\Response;
 
 /**
- * Simple adapter that allows the input of raw HTML
+ * Adapter to load content from a URL using the Guzzle library
  *
- * Class HTMLAdapter
+ * Class GuzzleAdapter
  * @package Optimus\Adapter
  */
 class GuzzleAdapter extends HTMLAdapter
