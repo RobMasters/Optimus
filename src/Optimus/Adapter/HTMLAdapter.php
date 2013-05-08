@@ -18,7 +18,7 @@ class HTMLAdapter implements AdapterInterface
     /**
      * @param $html
      */
-    function __construct($html)
+    function __construct($html = '')
     {
         $this->html = $html;
     }
@@ -32,5 +32,15 @@ class HTMLAdapter implements AdapterInterface
         $document->loadHTML($this->html);
 
         return $document;
+    }
+
+    /**
+     * Setter for classes that extend this
+     *
+     * @param $html
+     */
+    protected function setHtml($html)
+    {
+        $this->html = $html;
     }
 }
