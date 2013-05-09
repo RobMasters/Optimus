@@ -17,29 +17,33 @@ if (system.args.length !== 2) {
         console.log("GOT HTTP REQUEST");
         console.log(JSON.stringify(request, null, 4));
 
-        source = 'http://' + request.url.replace(/^\//, '');
+        source = 'http://' + request.url.replace(/^\//, '').replace('%3A', ':');
         console.log('requesting url: ' + source);
 
         response.statusCode = 200;
         response.headers = {"Cache": "no-cache", "Content-Type": "application/json"};
 
+        page.onConsoleMessage = function (msg) {
+            console.log(msg);
+        };
+
         page.open(source, function (status) {
             if (status !== 'success') {
-                console.log('Unable to access network');
-                response.write("<html><head><title>Crawling " + source + "...</title></head>");
-                response.write("<body><p>failed</body></html>");
-                response.close();
+                console.log('Unable to access ' + source);
+                response.write(JSON.stringify({
+                    error: 'Unable to access ' + source
+                }));
             } else {
                 var html = page.evaluate(function () {
+                    console.log('page evaluated');
                     return document.getElementsByTagName('html')[0].innerHTML
                 });
-                console.log(html);
 
                 response.write(JSON.stringify({
                     source: html
                 }));
-                response.close();
             }
+            response.close();
         });
     });
     if (!listening) {

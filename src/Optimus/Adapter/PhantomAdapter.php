@@ -30,13 +30,24 @@ class PhantomAdapter extends HTMLAdapter
      * @param $port
      * @param string $url
      */
-    function __construct($host, $port, $url)
+    function __construct($host, $port, $url = '')
     {
         $this->host = $host;
         $this->port = $port;
         $this->url = $url;
 
         // TODO validate phantom server is running
+    }
+
+    /**
+     * @param $url
+     * @return $this
+     */
+    public function setUrl($url)
+    {
+        $this->url = $url;
+
+        return $this;
     }
 
     /**
