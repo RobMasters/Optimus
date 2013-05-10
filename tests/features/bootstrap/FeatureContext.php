@@ -80,6 +80,14 @@ class FeatureContext extends BehatContext
     }
 
     /**
+     * @Given /^The following markup:$/
+     */
+    public function theFollowingMarkup(PyStringNode $string)
+    {
+        $this->adapterHtml = $string;
+    }
+
+    /**
      * @When /^I transcode the page$/
      */
     public function iTranscodeThePage()
