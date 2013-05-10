@@ -36,6 +36,7 @@ class GuzzleAdapter extends HTMLAdapter
     {
         $this->client = $client;
         $this->url = $url;
+
     }
 
     /**

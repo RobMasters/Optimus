@@ -8,13 +8,6 @@ use Behat\Gherkin\Node\PyStringNode,
     Behat\Gherkin\Node\TableNode;
 use Optimus\Adapter\AdapterInterface;
 
-//
-// Require 3rd-party libraries here:
-//
-//   require_once 'PHPUnit/Autoload.php';
-//   require_once 'PHPUnit/Framework/Assert/Functions.php';
-//
-
 /**
  * Features context.
  */
@@ -27,6 +20,21 @@ class FeatureContext extends BehatContext
      * @var AdapterInterface
      */
     protected $adapter;
+
+    /**
+     * @var string
+     */
+    protected $adapterType;
+
+    /**
+     * @var string
+     */
+    protected $adapterUrl;
+
+    /**
+     * @var string
+     */
+    protected $adapterHtml;
 
     /**
      * @var DOMDocument
@@ -47,28 +55,28 @@ class FeatureContext extends BehatContext
     /**
      * @Given /^I have a "([^"]*)" adapter$/
      */
-    public function iHaveAnAdapter($adapterName)
+    public function iHaveAnAdapter($adapterType)
     {
-        switch ($adapterName) {
-            case 'Phantom':
-                $this->adapter = new \Optimus\Adapter\PhantomAdapter('localhost', self::PHANTOM_PORT);
-                break;
+        $adapterType = strtolower($adapterType);
 
-            case 'Guzzle':
-                $this->adapter = new \Optimus\Adapter\GuzzleAdapter(new \Guzzle\Http\Client());
+        switch ($adapterType) {
+            case 'html':
+            case 'phantom':
+            case 'guzzle':
+                $this->adapterType = $adapterType;
                 break;
 
             default:
-                throw new \Exception("Uknown adapter, `$adapterName`");
+                throw new \Exception("Uknown adapter, `$adapterType`");
         }
     }
 
     /**
-     * @Given /^I am using the "([^"]*)" example$/
+     * @Given /^I am requesting "([^"]*)"$/
      */
-    public function iAmUsingTheExample($filename)
+    public function iAmRequesting($arg1)
     {
-        $this->adapter->setUrl(sprintf('localhost:%d/%s.html', self::WEB_SERVER_PORT, $filename));
+        $this->adapterUrl = $arg1;
     }
 
     /**
@@ -77,6 +85,27 @@ class FeatureContext extends BehatContext
     public function iTranscodeThePage()
     {
         $transcoder = new \Optimus\Transcoder($this->dispatcher);
+
+        switch ($this->adapterType) {
+            case 'html':
+                $this->adapter = new \Optimus\Adapter\HTMLAdapter($this->adapterHtml);
+                break;
+
+            case 'phantom':
+                $url = sprintf('localhost:%d/%s', self::WEB_SERVER_PORT, $this->adapterUrl);
+                $this->adapter = new \Optimus\Adapter\PhantomAdapter('localhost', self::PHANTOM_PORT, $url);
+                break;
+
+            case 'guzzle':
+                $client = new \Guzzle\Http\Client('', array(
+                    'curl.options' => array(
+                        CURLOPT_PORT => self::WEB_SERVER_PORT
+                    )
+                ));
+                $client->setEventDispatcher($this->dispatcher);
+                $this->adapter = new \Optimus\Adapter\GuzzleAdapter($client, sprintf('http://localhost/%s', $this->adapterUrl));
+                break;
+        }
 
         $this->result = $transcoder
             ->setAdapter($this->adapter)
@@ -94,6 +123,17 @@ class FeatureContext extends BehatContext
 
         if ($value != $expectedText) {
             throw new Exception("`$value`` does not equal $expectedText");
+        }
+    }
+
+    /**
+     * @Then /^"([^"]*)" should not exist$/
+     */
+    public function shouldNotExist($selector)
+    {
+        $crawler = new \Symfony\Component\DomCrawler\Crawler($this->result);
+        if ($crawler->filter($selector)->count()) {
+            throw new Exception("`$selector` should not match any elements");
         }
     }
 }
