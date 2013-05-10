@@ -32,10 +32,21 @@ class GuzzleAdapter extends HTMLAdapter
      * @param \Guzzle\Http\Client $client
      * @param $url
      */
-    function __construct(Client $client, $url)
+    function __construct(Client $client, $url = '')
     {
         $this->client = $client;
         $this->url = $url;
+    }
+
+    /**
+     * @param $url
+     * @return $this
+     */
+    public function setUrl($url)
+    {
+        $this->url = $url;
+
+        return $this;
     }
 
     /**
