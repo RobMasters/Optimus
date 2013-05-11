@@ -9,4 +9,6 @@ notifications:
 before_script:
     - composer install --dev
 
-script: "./vendor/bin/phpunit"
+script:
+    - "./vendor/bin/phpunit"
+    - "./vendor/bin/behat --profile standalone"
