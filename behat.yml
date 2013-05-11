@@ -1,3 +1,9 @@
 default:
   paths:
     features: tests/features
+
+standalone:
+  paths:
+    features: tests/features
+  filters:
+      tags: "~@webserver"

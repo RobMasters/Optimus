@@ -82,9 +82,11 @@ class FeatureContext extends BehatContext
     /**
      * @Given /^The following markup:$/
      */
-    public function theFollowingMarkup(PyStringNode $string)
+    public function theFollowingMarkup(PyStringNode $html)
     {
-        $this->adapterHtml = $string;
+        // We can safely assume that we're using the HTML adapter
+        $this->iHaveAnAdapter('html');
+        $this->adapterHtml = $html;
     }
 
     /**

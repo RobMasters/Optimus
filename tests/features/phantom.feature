@@ -1,3 +1,4 @@
+@webserver @phantom
 Feature: Phantom adapter
   In order to get the source from a given URL
   As a user

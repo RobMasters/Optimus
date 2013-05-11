@@ -5,8 +5,7 @@ Feature: Add position class transformer
   I need to be able to add position classes automatically based on their order in the DOM
 
   Background:
-    Given I have a "HTML" adapter
-    And The following markup:
+    Given The following markup:
     """
         <!DOCTYPE html>
         <html>
