@@ -9,7 +9,7 @@ abstract class BaseTransformer implements TransformerInterface
     /**
      * @var array|ConstraintInterface[]
      */
-    protected $constraints;
+    protected $constraints = array();
 
     /**
      * @param \DOMElement $node

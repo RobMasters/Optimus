@@ -16,11 +16,18 @@ class HTMLAdapter implements AdapterInterface
     protected $html;
 
     /**
-     * @param $html
+     * @var array
      */
-    function __construct($html = '')
+    protected $tidyConfig = array();
+
+    /**
+     * @param string $html
+     * @param array $tidyConfig
+     */
+    function __construct($html = '', $tidyConfig = array())
     {
         $this->html = $html;
+        $this->tidyConfig = $tidyConfig;
     }
 
     /**
@@ -29,7 +36,7 @@ class HTMLAdapter implements AdapterInterface
     public function getDocument()
     {
         $document = new \DOMDocument();
-        $document->loadHTML($this->html);
+        $document->loadHTML(tidy_repair_string($this->html, $this->tidyConfig));
 
         return $document;
     }

@@ -14,7 +14,7 @@ use Optimus\Adapter\AdapterInterface;
 class FeatureContext extends BehatContext
 {
     const WEB_SERVER_PORT = 8000;
-    const PHANTOM_PORT = 8080;
+    const PHANTOM_PORT = 8999;
 
     /**
      * @var AdapterInterface
@@ -88,6 +88,16 @@ class FeatureContext extends BehatContext
     }
 
     /**
+     * @Given /^I apply the "([^"]*)" transformer to "([^"]*)" nodes$/
+     */
+    public function iApplyTheTransformerToNodes($transformerName, $selector)
+    {
+        $transformer = $this->getTransformer($transformerName);
+
+        $this->dispatcher->addTransformer($selector, $transformer);
+    }
+
+    /**
      * @When /^I transcode the page$/
      */
     public function iTranscodeThePage()
@@ -143,5 +153,29 @@ class FeatureContext extends BehatContext
         if ($crawler->filter($selector)->count()) {
             throw new Exception("`$selector` should not match any elements");
         }
+    }
+
+    /**
+     * @Then /^"([^"]*)" should have the class "([^"]*)"$/
+     */
+    public function shouldHaveTheClass($selector, $arg2)
+    {
+        $crawler = new \Symfony\Component\DomCrawler\Crawler($this->result);
+        $class = $crawler->filter($selector)->attr('class');
+
+        if (strpos($class, $arg2) === false) {
+            throw new Exception(sprintf('Expected class `%s` does not match `%s`', $arg2, $class));
+        }
+    }
+
+    /**
+     * @param Optimus\Transformer\BaseTransformer
+     * @return mixed
+     */
+    private function getTransformer($transformerName)
+    {
+        $className = 'Optimus\\Transformer\\' . str_replace(' ', '', ucwords($transformerName)) . 'Transformer';
+
+        return new $className;
     }
 }
