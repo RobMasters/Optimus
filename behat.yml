@@ -1,9 +1,9 @@
 default:
   context:
     parameters:
-      url: http://localhost:8000
+      url: http://localhost:8081
       documentRoot: tests/examples
-      timeout: 1
+      timeout: 10
       phantom_port: 8999
   paths:
     features: tests/features
