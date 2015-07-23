@@ -59,11 +59,7 @@ class Transcoder
     protected function transcodeList(\DOMNodeList $list, $parentEvent = null)
     {
         $i = 0;
-        $node = $list->item(0);
-
-        while ($node) {
-            $node = $list->item($i);
-
+        while ($node = $list->item($i)) {
             switch ($node->nodeType) {
                 case XML_TEXT_NODE:
                     $event = new TranscodeTextEvent($node, $parentEvent, $i);
@@ -79,7 +75,6 @@ class Transcoder
                     // ?
             }
 
-            $node = $node->nextSibling;
             $i++;
         }
     }
@@ -106,6 +101,10 @@ class Transcoder
 
         if (!$event->isPropagationStopped()) {
             $this->dispatcher->dispatch('*', $event);
+
+            if ($event->isNodeRemoved()) {
+                $node->parentNode->removeChild($node);
+            }
 
             if (!$event->isPropagationStopped() && $children = $node->childNodes) {
                 $this->transcodeList($children, $event);

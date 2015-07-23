@@ -23,7 +23,7 @@ class EventDispatcher extends BaseDispatcher
         $selectors = (array) $selectors;
         foreach ($selectors as $selector) {
             $transformerClone = null;
-            if (!preg_match('/^[a-z]$/i', $selector)) {
+            if (!preg_match('/^[a-z*]$/i', $selector)) {
                 if (!preg_match('/^([a-z]*)(?:#([a-z0-9_-]+))?((?:\.[a-z0-9_-]+)*)$/', $selector, $matches)) {
                     throw new InvalidArgumentException(sprintf('Invalid node selector: `%s`', $selector));
                 }
